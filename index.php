@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 session_start();
 
 if (!isset($_SESSION["id"])) {
-    $_SESSION["id"] = "Charles";
+    $_SESSION["id"] = "Hugo";
 }
 
 function send_chat($nick, $chat, $file = null) {
@@ -153,9 +153,12 @@ if (isset($_GET["chat"])) {
                         let message = `<b>${post[0]}</b> `;
 message += `<span style="color:gray; font-size:smaller;">${post[2]}</span> `;
 message += `<span style="color:gray; font-size:smaller;">${post[3]}</span><br>`;
-message += `${post[1]} <br>`;
+if (post[1] != ""){
+    message += `${post[1]} <br><br>`;
+}
+
 if (post[4]) {
-    message += `<a href="uploads/${post[4]}" download>${post[4]}</a>`;
+    message += `<a href="uploads/${post[4]}" download>${post[4]}</a><br><br>`;
 }
                         row.innerHTML = message;
                         chatDiv.appendChild(row);
