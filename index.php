@@ -28,7 +28,7 @@ function send_chat($nick, $chat, $file = null) {
     $new_key = count($decode);
 
     $chat = htmlspecialchars($chat, ENT_QUOTES, 'UTF-8');
-    $time = date('H:i:s');  // Format de l'heure
+    $time = date('H:i');  // Format de l'heure
 
     $file_info = null;
     $maxFileSize = 20 * 1024 * 1024; // 20 Mo
