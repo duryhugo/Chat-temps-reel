@@ -112,16 +112,16 @@ if (isset($_GET["chat"])) {
         .msg { list-style-type: none; }
         .msg .nick { text-shadow: 1px 2px 3px red; }
         #chat {
-    height: auto; /* Ajuste la hauteur en fonction du contenu */
-    max-height: 500px; /* Limite maximale de hauteur si nécessaire */
-    overflow-y: auto; /* Ajoute un défilement vertical si nécessaire */
-    border: 1px solid #ccc; /* Bordure */
-    padding: 10px; /* Marge intérieure */
-}
+            height: 500px; /* Hauteur maximale par défaut */
+            max-height: 500px; /* Limite maximale de hauteur si nécessaire */
+            overflow-y: auto; /* Ajoute un défilement vertical si nécessaire */
+            border: 1px solid #ccc; /* Bordure */
+            padding: 10px; /* Marge intérieure */
+        }
 
-textarea {
-    resize: none; /* Désactive le redimensionnement */
-}
+        textarea {
+            resize: none; /* Désactive le redimensionnement */
+        }
 
         #file-input {
             display: none;
@@ -132,113 +132,117 @@ textarea {
     </style>
 </head>
 <body>
-    <div style="margin-top: 5px" class="container">
-        <div class="row">
-            <div class="col-md-12" id="chat"></div>
-            <div class="col-md-12">
-                <form id="input-chat" action="" method="post" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label>Chat</label>
-                        <div class="input-group">
-                            <textarea class="form-control" name="chat"></textarea>
-                            <span class="input-group-btn">
-                                <button id="file-button" class="btn btn-default" type="button">
-                                <img src="trombone.png" alt="Attach" style="width: 20px; height: 20px;">
-                                </button>
-                            </span>
-                            <span class="input-group-btn">
-                                <button id="emoji-button" class="btn btn-default" type="button">😊</button>
-                            </span>
-                        </div>
-                        <br>
-                        <input type="file" id="file-input" name="file"><br>
-                        <input class="btn btn-sm btn-primary" value="Envoyer" type="submit"/>
+<div style="margin-top: 5px" class="container">
+    <div class="row">
+        <div class="col-md-12" id="chat"></div>
+        <div class="col-md-12">
+            <form id="input-chat" action="" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Chat</label>
+                    <div class="input-group">
+                        <textarea class="form-control" name="chat"></textarea>
+                        <span class="input-group-btn">
+                            <button id="file-button" class="btn btn-default" type="button">
+                            <img src="trombone.png" alt="Attach" style="width: 20px; height: 20px;">
+                            </button>
+                        </span>
+                        <span class="input-group-btn">
+                            <button id="emoji-button" class="btn btn-default" type="button">😊</button>
+                        </span>
                     </div>
-                </form>
-                <div id="file-name"></div>
-            </div>
+                    <br>
+                    <input type="file" id="file-input" name="file"><br>
+                    <input class="btn btn-sm btn-primary" value="Envoyer" type="submit"/>
+                </div>
+            </form>
+            <div id="file-name"></div>
         </div>
-
-        <script>
-        let lastId = -1;
-        let isScrolledToBottom = true;
-        let userSentMessage = false;
-
-        const chatDiv = document.getElementById('chat');
-
-        chatDiv.addEventListener('scroll', function() {
-            isScrolledToBottom = chatDiv.scrollHeight - chatDiv.scrollTop === chatDiv.clientHeight;
-        });
-
-        document.getElementById('file-button').addEventListener('click', function() {
-            document.getElementById('file-input').click();
-        });
-
-        document.getElementById('file-input').addEventListener('change', function() {
-            const fileInput = document.getElementById('file-input');
-            const fileNameDiv = document.getElementById('file-name');
-
-            if (fileInput.files.length > 0) {
-                const fileName = fileInput.files[0].name;
-                fileNameDiv.textContent = `Fichier sélectionné: ${fileName}`;
-            } else {
-                fileNameDiv.textContent = '';
-            }
-        });
-
-        async function fetchChat() {
-            try {
-                const response = await fetch(`?chat=1&last_id=${lastId}`);
-                const data = await response.json();
-                if (data.status !== 'no data') {
-                    Object.keys(data).forEach(key => {
-                        const post = data[key];
-                        const row = document.createElement('div');
-                        let message = `<b>${post[0]}</b> `;
-                        message += `<span style="color:gray; font-size:smaller;">${post[2]}</span> `;
-                        message += `<span style="color:gray; font-size:smaller;">${post[3]}</span><br>`;
-                        if (post[1] != ""){
-                            message += `${post[1]} <br><br>`;
-                        }
-                        if (post[4]) {
-                            message += `<a href="uploads/${post[4]}" download>${post[4]}</a><br><br>`;
-                        }
-                        row.innerHTML = message;
-                        chatDiv.appendChild(row);
-                        lastId = Math.max(lastId, parseInt(key));
-                    });
-
-                    if (isScrolledToBottom || userSentMessage) {
-                        chatDiv.scrollTop = chatDiv.scrollHeight;
-                        userSentMessage = false;
-                    }
-                }
-            } catch (error) {
-                console.error('Error fetching chat data:', error);
-            }
-        }
-
-        document.getElementById('input-chat').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            userSentMessage = true;
-            const fileInput = document.querySelector('input[type="file"]');
-            const maxFileSize = 20 * 1024 * 1024;
-            if (fileInput.files[0] && fileInput.files[0].size > maxFileSize) {
-                alert('Le fichier est trop volumineux. La taille maximale autorisée est de 20 Mo.');
-                return;
-            }
-            const formData = new FormData(this);
-            await fetch(this.action, {
-                method: 'POST',
-                body: formData
-            });
-            this.reset();
-            document.getElementById('file-name').textContent = '';
-            await fetchChat();
-        });
-
-        setInterval(fetchChat, 2000);
-        </script>
     </div>
+
+    <script>
+    let lastId = -1;
+    let isScrolledToBottom = true;
+    let userSentMessage = false;
+
+    const chatDiv = document.getElementById('chat');
+
+    chatDiv.addEventListener('scroll', function() {
+        isScrolledToBottom = chatDiv.scrollHeight - chatDiv.scrollTop === chatDiv.clientHeight;
+    });
+
+    document.getElementById('file-button').addEventListener('click', function() {
+        document.getElementById('file-input').click();
+    });
+
+    document.getElementById('file-input').addEventListener('change', function() {
+        const fileInput = document.getElementById('file-input');
+        const fileNameDiv = document.getElementById('file-name');
+
+        if (fileInput.files.length > 0) {
+            const fileName = fileInput.files[0].name;
+            fileNameDiv.textContent = `Fichier sélectionné: ${fileName}`;
+        } else {
+            fileNameDiv.textContent = '';
+        }
+    });
+
+    async function fetchChat() {
+        try {
+            const response = await fetch(`?chat=1&last_id=${lastId}`);
+            const data = await response.json();
+            if (data.status !== 'no data') {
+                Object.keys(data).forEach(key => {
+                    const post = data[key];
+                    const row = document.createElement('div');
+                    let message = `<b>${post[0]}</b> `;
+                    message += `<span style="color:gray; font-size:smaller;">${post[2]}</span> `;
+                    message += `<span style="color:gray; font-size:smaller;">${post[3]}</span><br>`;
+                    if (post[1] != ""){
+                        message += `${post[1]} <br><br>`;
+                    }
+                    if (post[4]) {
+                        message += `<a href="uploads/${post[4]}" download>${post[4]}</a><br><br>`;
+                    }
+                    row.innerHTML = message;
+                    chatDiv.appendChild(row);
+                    lastId = Math.max(lastId, parseInt(key));
+                });
+
+                if (isScrolledToBottom || userSentMessage) {
+                    chatDiv.scrollTop = chatDiv.scrollHeight;
+                    userSentMessage = false;
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching chat data:', error);
+        }
+    }
+
+    document.getElementById('input-chat').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        userSentMessage = true;
+        const fileInput = document.querySelector('input[type="file"]');
+        const maxFileSize = 20 * 1024 * 1024;
+        if (fileInput.files[0] && fileInput.files[0].size > maxFileSize) {
+            alert('Le fichier est trop volumineux. La taille maximale autorisée est de 20 Mo.');
+            return;
+        }
+        const formData = new FormData(this);
+        await fetch(this.action, {
+            method: 'POST',
+            body: formData
+        });
+        this.reset();
+        document.getElementById('file-name').textContent = '';
+        await fetchChat();
+    });
+
+    // Appel initial pour récupérer les données de chat
+    fetchChat();
+
+    // Mettre à jour les données de chat toutes les 2 secondes
+    setInterval(fetchChat, 2000);
+    </script>
+</div>
 </body>
 </html>
