@@ -28,6 +28,7 @@ function send_chat($nick, $chat, $file = null) {
     $new_key = count($decode);
 
     $chat = htmlspecialchars($chat, ENT_QUOTES, 'UTF-8');
+    $date = date('d/m/Y');  // Format de la date
     $time = date('H:i');  // Format de l'heure
 
     $file_info = null;
@@ -49,7 +50,7 @@ function send_chat($nick, $chat, $file = null) {
         error_log("File upload error: " . $file['error']);
     }
 
-    $format = array($nick, $chat, $time, $file_info);
+    $format = array($nick, $chat, $date, $time, $file_info);
     $decode[] = $format;
     $encode = json_encode($decode);
 
@@ -150,10 +151,11 @@ if (isset($_GET["chat"])) {
                         const post = data[key];
                         const row = document.createElement('div');
                         let message = `<b>${post[0]}</b>: ${post[1]}`;
-                        if (post[3]) {
-                            message += ` <a href="uploads/${post[3]}" download>${post[3]}</a>`;
-                        }
-                        message += ` <span style="color:gray; font-size:smaller;">(${post[2]})</span>`;
+if (post[4]) {
+    message += ` <a href="uploads/${post[4]}" download>${post[4]}</a>`;
+}
+message += `<span style="color:gray; font-size:smaller;">${post[3]}</span> `;
+message += `<span style="color:gray; font-size:smaller;">(${post[2]})</span>`;
                         row.innerHTML = message;
                         chatDiv.appendChild(row);
                         lastId = Math.max(lastId, parseInt(key));
