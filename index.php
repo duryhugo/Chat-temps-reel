@@ -100,7 +100,6 @@ if (isset($_GET["chat"])) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -113,6 +112,12 @@ if (isset($_GET["chat"])) {
         .msg { list-style-type: none; }
         .msg .nick { text-shadow: 1px 2px 3px red; }
         #chat { height: 400px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; }
+        #file-input {
+            display: none;
+        }
+        #file-name {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -126,20 +131,39 @@ if (isset($_GET["chat"])) {
                         <div class="input-group">
                             <textarea class="form-control" name="chat"></textarea>
                             <span class="input-group-btn">
+                                <button id="file-button" class="btn btn-default" type="button">📎</button>
+                            </span>
+                            <span class="input-group-btn">
                                 <button id="emoji-button" class="btn btn-default" type="button">😊</button>
                             </span>
                         </div>
                         <br>
-                        <label>Fichier</label>
-                        <input type="file" class="form-control" name="file"><br>
+                        <input type="file" id="file-input" name="file"><br>
                         <input class="btn btn-sm btn-primary" value="Envoyer" type="submit"/>
                     </div>
                 </form>
+                <div id="file-name"></div>
             </div>
         </div>
 
         <script>
         let lastId = -1;
+
+        document.getElementById('file-button').addEventListener('click', function() {
+            document.getElementById('file-input').click();
+        });
+
+        document.getElementById('file-input').addEventListener('change', function() {
+            const fileInput = document.getElementById('file-input');
+            const fileNameDiv = document.getElementById('file-name');
+
+            if (fileInput.files.length > 0) {
+                const fileName = fileInput.files[0].name;
+                fileNameDiv.textContent = `Fichier sélectionné: ${fileName}`;
+            } else {
+                fileNameDiv.textContent = '';
+            }
+        });
 
         async function fetchChat() {
             try {
@@ -151,15 +175,14 @@ if (isset($_GET["chat"])) {
                         const post = data[key];
                         const row = document.createElement('div');
                         let message = `<b>${post[0]}</b> `;
-message += `<span style="color:gray; font-size:smaller;">${post[2]}</span> `;
-message += `<span style="color:gray; font-size:smaller;">${post[3]}</span><br>`;
-if (post[1] != ""){
-    message += `${post[1]} <br><br>`;
-}
-
-if (post[4]) {
-    message += `<a href="uploads/${post[4]}" download>${post[4]}</a><br><br>`;
-}
+                        message += `<span style="color:gray; font-size:smaller;">${post[2]}</span> `;
+                        message += `<span style="color:gray; font-size:smaller;">${post[3]}</span><br>`;
+                        if (post[1] != ""){
+                            message += `${post[1]} <br><br>`;
+                        }
+                        if (post[4]) {
+                            message += `<a href="uploads/${post[4]}" download>${post[4]}</a><br><br>`;
+                        }
                         row.innerHTML = message;
                         chatDiv.appendChild(row);
                         lastId = Math.max(lastId, parseInt(key));
@@ -185,6 +208,7 @@ if (post[4]) {
                 body: formData
             });
             this.reset();
+            document.getElementById('file-name').textContent = '';
             await fetchChat();
         });
 
