@@ -115,7 +115,7 @@ if (isset($_GET["chat"])) {
             height: 500px; /* Hauteur maximale par défaut */
             max-height: 500px; /* Limite maximale de hauteur si nécessaire */
             overflow-y: auto; /* Ajoute un défilement vertical si nécessaire */
-            border: 1px solid #ccc; /* Bordure */
+            border: none; /* Bordure */
             padding: 10px; /* Marge intérieure */
         }
 
@@ -134,6 +134,16 @@ if (isset($_GET["chat"])) {
             margin-right: 5px; /* Marge à droite pour les boutons */
             border: none; /* Supprime la bordure */
         }
+
+        .btn-primary{
+            background : white;
+            border : none;
+        }
+
+        .btn-primary:hover{
+            background : white;
+            border : none;
+        }
     </style>
 </head>
 <body>
@@ -143,9 +153,13 @@ if (isset($_GET["chat"])) {
         <div class="col-md-12">
             <form id="input-chat" action="" method="post" enctype="multipart/form-data">
                 <div class="form-group">
-
                     <div class="input-group">
-                        <textarea class="form-control" name="chat" placeholder="Taper un message"></textarea>
+                        <textarea class="form-control" name="chat" placeholder="Tapez un message"></textarea>
+                        <span class="input-group-btn">
+                            <button class="btn btn-sm btn-primary" value="Envoyer" type="submit">
+                            <img src="envoie.png" alt="Attach" style="width: 18px; height: 18px;">
+                            </button>
+                        </span>
                         <span class="input-group-btn">
                             <button id="file-button" class="btn btn-default" type="button">
                             <img src="trombone.png" alt="Attach" style="width: 20px; height: 20px;">
@@ -157,7 +171,6 @@ if (isset($_GET["chat"])) {
                     </div>
                     <br>
                     <input type="file" id="file-input" name="file"><br>
-                    <input class="btn btn-sm btn-primary" value="Envoyer" type="submit"/>
                 </div>
             </form>
             <div id="file-name"></div>
