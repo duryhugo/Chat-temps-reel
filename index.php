@@ -7,7 +7,7 @@ if (!isset($_SESSION["id"])) {
     $_SESSION["id"] = "Hugo";
 }
 
-function send_chat($nick, $chat, $file = null) {
+function send_chat($nick, $chat, $files = null) {
     $filename = "chat.json";
     if (!file_exists($filename)) {
         $decode = array();
@@ -31,26 +31,28 @@ function send_chat($nick, $chat, $file = null) {
     $date = date('d/m/Y');
     $time = date('H:i');
 
-    $file_info = null;
+    $file_infos = array();
     $maxFileSize = 20 * 1024 * 1024; // 20 Mo
 
-    if ($file && $file['error'] == 0) {
-        if ($file['size'] <= $maxFileSize) {
-            $file_name = basename($file['name']);
-            $file_path = 'uploads/' . $file_name;
-            if (move_uploaded_file($file['tmp_name'], $file_path)) {
-                $file_info = $file_name;
+    if ($files) {
+        foreach ($files['name'] as $index => $name) {
+            if ($files['error'][$index] == 0 && $files['size'][$index] <= $maxFileSize) {
+                $file_name = basename($name);
+                $file_path = 'uploads/' . $file_name;
+                if (move_uploaded_file($files['tmp_name'][$index], $file_path)) {
+                    $file_infos[] = $file_name;
+                } else {
+                    error_log("File upload failed: " . print_r($files, true));
+                }
             } else {
-                error_log("File upload failed: " . print_r($file, true));
+                error_log("File upload error: " . $files['error'][$index]);
             }
-        } else {
-            error_log("File is too large: " . $file['size']);
         }
-    } else {
-        error_log("File upload error: " . $file['error']);
     }
 
-    $format = array($nick, $chat, $date, $time, $file_info);
+    $file_info_str = implode(', ', $file_infos);
+
+    $format = array($nick, $chat, $date, $time, $file_info_str);
     $decode[] = $format;
     $encode = json_encode($decode);
 
@@ -86,11 +88,11 @@ function show_chat($last_id = -1) {
     return json_encode($filtered_data);
 }
 
-if ((isset($_POST["chat"]) && $_POST["chat"] != "") || (isset($_FILES['file']) && $_FILES['file']['error'] == 0)) {
+if ((isset($_POST["chat"]) && $_POST["chat"] != "") || (isset($_FILES['files']) && $_FILES['files']['error'][0] == 0)) {
     $nick = $_SESSION["id"];
     $chat = isset($_POST["chat"]) ? $_POST["chat"] : "";
-    $file = isset($_FILES['file']) ? $_FILES['file'] : null;
-    send_chat($nick, $chat, $file);
+    $files = isset($_FILES['files']) ? $_FILES['files'] : null;
+    send_chat($nick, $chat, $files);
 }
 
 if (isset($_GET["chat"])) {
@@ -170,7 +172,8 @@ if (isset($_GET["chat"])) {
                         </span>
                     </div>
                     <br>
-                    <input type="file" id="file-input" name="file"><br>
+                    <!-- Update the file input to accept multiple files -->
+                    <input type="file" id="file-input" name="files[]" multiple><br>
                 </div>
             </form>
             <div id="file-name"></div>
@@ -195,10 +198,14 @@ if (isset($_GET["chat"])) {
         document.getElementById('file-input').addEventListener('change', function() {
             const fileInput = document.getElementById('file-input');
             const fileNameDiv = document.getElementById('file-name');
+            const files = fileInput.files;
 
-            if (fileInput.files.length > 0) {
-                const fileName = fileInput.files[0].name;
-                fileNameDiv.textContent = `Fichier sélectionné: ${fileName}`;
+            if (files.length > 0) {
+                let fileNames = '';
+                for (let i = 0; i < files.length; i++) {
+                    fileNames += files[i].name + (i < files.length - 1 ? ', ' : '');
+                }
+                fileNameDiv.textContent = `Fichiers sélectionnés: ${fileNames}`;
             } else {
                 fileNameDiv.textContent = '';
             }
@@ -226,7 +233,10 @@ if (isset($_GET["chat"])) {
                             message += `${post[1]} <br><br>`;
                         }
                         if (post[4]) {
-                            message += `<a href="uploads/${post[4]}" download>${post[4]}</a><br><br>`;
+                            const files = post[4].split(',').map(file => file.trim());
+                            files.forEach(file => {
+                                message += `<a href="uploads/${file}" download>${file}</a><br>`;
+                            });
                         }
                         row.innerHTML = message;
                         chatDiv.appendChild(row);
@@ -248,9 +258,11 @@ if (isset($_GET["chat"])) {
             userSentMessage = true;
             const fileInput = document.querySelector('input[type="file"]');
             const maxFileSize = 20 * 1024 * 1024;
-            if (fileInput.files[0] && fileInput.files[0].size > maxFileSize) {
-                alert('Le fichier est trop volumineux. La taille maximale autorisée est de 20 Mo.');
-                return;
+            for (const file of fileInput.files) {
+                if (file.size > maxFileSize) {
+                    alert('Un fichier est trop volumineux. La taille maximale autorisée est de 20 Mo.');
+                    return;
+                }
             }
             const formData = new FormData(this);
             await fetch(this.action, {
