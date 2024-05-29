@@ -25,12 +25,7 @@ function send_chat($nick, $chat, $file = null) {
         $decode = array();
     }
 
-    end($decode);
-    $new_key = key($decode) !== null ? key($decode) + 1 : 0;
-    if ($new_key >= 10) {
-        array_shift($decode);
-        $new_key = 9;
-    }
+    $new_key = count($decode);
 
     $chat = htmlspecialchars($chat, ENT_QUOTES, 'UTF-8');
     $time = date('H:i:s');  // Format de l'heure
@@ -55,7 +50,7 @@ function send_chat($nick, $chat, $file = null) {
     }
 
     $format = array($nick, $chat, $time, $file_info);
-    $decode[$new_key] = $format;
+    $decode[] = $format;
     $encode = json_encode($decode);
 
     $fopen_w = fopen($filename, "w");
@@ -106,7 +101,7 @@ if (isset($_GET["chat"])) {
 
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="fr">
 <head>
     <title>Chat</title>
     <meta charset="utf-8">
@@ -146,33 +141,34 @@ if (isset($_GET["chat"])) {
         let lastId = -1;
 
         async function fetchChat() {
-            console.log(`Fetching chat messages with lastId: ${lastId}`);
-            const response = await fetch(`?chat=1&last_id=${lastId}`);
-            const data = await response.json();
-            console.log('Received data:', data);
-
-            if (data.status !== 'no data') {
-                const chatDiv = document.getElementById('chat');
-                Object.keys(data).forEach(key => {
-                    const post = data[key];
-                    const row = document.createElement('div');
-                    let message = `<b>${post[0]}</b>: ${post[1]}`;
-                    if (post[3]) {
-                        message += ` <a href="uploads/${post[3]}" download>${post[3]}</a>`;
-                    }
-                    message += ` <span style="color:gray; font-size:smaller;">(${post[2]})</span>`;
-                    row.innerHTML = message;
-                    chatDiv.appendChild(row);
-                    lastId = Math.max(lastId, parseInt(key));  // Update lastId to the latest message ID
-                });
-                chatDiv.scrollTop = chatDiv.scrollHeight; // Scroll to bottom
+            try {
+                const response = await fetch(`?chat=1&last_id=${lastId}`);
+                const data = await response.json();
+                if (data.status !== 'no data') {
+                    const chatDiv = document.getElementById('chat');
+                    Object.keys(data).forEach(key => {
+                        const post = data[key];
+                        const row = document.createElement('div');
+                        let message = `<b>${post[0]}</b>: ${post[1]}`;
+                        if (post[3]) {
+                            message += ` <a href="uploads/${post[3]}" download>${post[3]}</a>`;
+                        }
+                        message += ` <span style="color:gray; font-size:smaller;">(${post[2]})</span>`;
+                        row.innerHTML = message;
+                        chatDiv.appendChild(row);
+                        lastId = Math.max(lastId, parseInt(key));
+                    });
+                    chatDiv.scrollTop = chatDiv.scrollHeight;
+                }
+            } catch (error) {
+                console.error('Error fetching chat data:', error);
             }
         }
 
         document.getElementById('input-chat').addEventListener('submit', async function(e) {
             e.preventDefault();
             const fileInput = document.querySelector('input[type="file"]');
-            const maxFileSize = 20 * 1024 * 1024; // 20 Mo
+            const maxFileSize = 20 * 1024 * 1024;
             if (fileInput.files[0] && fileInput.files[0].size > maxFileSize) {
                 alert('Le fichier est trop volumineux. La taille maximale autorisée est de 20 Mo.');
                 return;
@@ -186,7 +182,7 @@ if (isset($_GET["chat"])) {
             await fetchChat();
         });
 
-        setInterval(fetchChat, 2000); // Fetch chat every 2 seconds
+        setInterval(fetchChat, 2000);
         </script>
     </div>
 </body>
