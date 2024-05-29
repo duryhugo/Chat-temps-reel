@@ -186,4 +186,4 @@ if (isset($_GET["chat"])) {
         </script>
     </div>
 </body>
-</html>g
+</html>
