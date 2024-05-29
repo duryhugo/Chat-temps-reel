@@ -150,12 +150,12 @@ if (isset($_GET["chat"])) {
                     Object.keys(data).forEach(key => {
                         const post = data[key];
                         const row = document.createElement('div');
-                        let message = `<b>${post[0]}</b>: `;
+                        let message = `<b>${post[0]}</b> `;
 if (post[4]) {
     message += ` <a href="uploads/${post[4]}" download>${post[4]}</a>`;
 }
-message += `<span style="color:gray; font-size:smaller;">${post[3]}</span> `;
-message += `<span style="color:gray; font-size:smaller;">(${post[2]})</span><br>${post[1]}`;
+message += `<span style="color:gray; font-size:smaller;">${post[2]}</span> `;
+message += `<span style="color:gray; font-size:smaller;">${post[3]}</span><br>${post[1]}`;
                         row.innerHTML = message;
                         chatDiv.appendChild(row);
                         lastId = Math.max(lastId, parseInt(key));
