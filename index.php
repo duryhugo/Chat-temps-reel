@@ -151,11 +151,12 @@ if (isset($_GET["chat"])) {
                         const post = data[key];
                         const row = document.createElement('div');
                         let message = `<b>${post[0]}</b> `;
-if (post[4]) {
-    message += ` <a href="uploads/${post[4]}" download>${post[4]}</a>`;
-}
 message += `<span style="color:gray; font-size:smaller;">${post[2]}</span> `;
-message += `<span style="color:gray; font-size:smaller;">${post[3]}</span><br>${post[1]}`;
+message += `<span style="color:gray; font-size:smaller;">${post[3]}</span><br>`;
+message += `${post[1]} <br>`;
+if (post[4]) {
+    message += `<a href="uploads/${post[4]}" download>${post[4]}</a>`;
+}
                         row.innerHTML = message;
                         chatDiv.appendChild(row);
                         lastId = Math.max(lastId, parseInt(key));
