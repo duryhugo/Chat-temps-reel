@@ -28,8 +28,8 @@ function send_chat($nick, $chat, $file = null) {
     $new_key = count($decode);
 
     $chat = htmlspecialchars($chat, ENT_QUOTES, 'UTF-8');
-    $date = date('d/m/Y');  // Format de la date
-    $time = date('H:i');  // Format de l'heure
+    $date = date('d/m/Y');
+    $time = date('H:i');
 
     $file_info = null;
     $maxFileSize = 20 * 1024 * 1024; // 20 Mo
@@ -148,6 +148,14 @@ if (isset($_GET["chat"])) {
 
         <script>
         let lastId = -1;
+        let isScrolledToBottom = true;
+        let userSentMessage = false;
+
+        const chatDiv = document.getElementById('chat');
+
+        chatDiv.addEventListener('scroll', function() {
+            isScrolledToBottom = chatDiv.scrollHeight - chatDiv.scrollTop === chatDiv.clientHeight;
+        });
 
         document.getElementById('file-button').addEventListener('click', function() {
             document.getElementById('file-input').click();
@@ -170,7 +178,6 @@ if (isset($_GET["chat"])) {
                 const response = await fetch(`?chat=1&last_id=${lastId}`);
                 const data = await response.json();
                 if (data.status !== 'no data') {
-                    const chatDiv = document.getElementById('chat');
                     Object.keys(data).forEach(key => {
                         const post = data[key];
                         const row = document.createElement('div');
@@ -187,7 +194,11 @@ if (isset($_GET["chat"])) {
                         chatDiv.appendChild(row);
                         lastId = Math.max(lastId, parseInt(key));
                     });
-                    chatDiv.scrollTop = chatDiv.scrollHeight;
+
+                    if (isScrolledToBottom || userSentMessage) {
+                        chatDiv.scrollTop = chatDiv.scrollHeight;
+                        userSentMessage = false;
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching chat data:', error);
@@ -196,6 +207,7 @@ if (isset($_GET["chat"])) {
 
         document.getElementById('input-chat').addEventListener('submit', async function(e) {
             e.preventDefault();
+            userSentMessage = true;
             const fileInput = document.querySelector('input[type="file"]');
             const maxFileSize = 20 * 1024 * 1024;
             if (fileInput.files[0] && fileInput.files[0].size > maxFileSize) {
