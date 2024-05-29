@@ -111,7 +111,18 @@ if (isset($_GET["chat"])) {
     <style>
         .msg { list-style-type: none; }
         .msg .nick { text-shadow: 1px 2px 3px red; }
-        #chat { height: 400px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; }
+        #chat {
+    height: auto; /* Ajuste la hauteur en fonction du contenu */
+    max-height: 500px; /* Limite maximale de hauteur si nécessaire */
+    overflow-y: auto; /* Ajoute un défilement vertical si nécessaire */
+    border: 1px solid #ccc; /* Bordure */
+    padding: 10px; /* Marge intérieure */
+}
+
+textarea {
+    resize: none; /* Désactive le redimensionnement */
+}
+
         #file-input {
             display: none;
         }
@@ -131,7 +142,9 @@ if (isset($_GET["chat"])) {
                         <div class="input-group">
                             <textarea class="form-control" name="chat"></textarea>
                             <span class="input-group-btn">
-                                <button id="file-button" class="btn btn-default" type="button">📎</button>
+                                <button id="file-button" class="btn btn-default" type="button">
+                                <img src="trombone.png" alt="Attach" style="width: 20px; height: 20px;">
+                                </button>
                             </span>
                             <span class="input-group-btn">
                                 <button id="emoji-button" class="btn btn-default" type="button">😊</button>
