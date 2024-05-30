@@ -34,6 +34,8 @@ function send_chat($nick, $chat, $files = null) {
     $file_infos = array();
     $maxFileSize = 20 * 1024 * 1024; // 20 Mo
 
+    $chat = nl2br($chat);
+
     if ($files) {
         foreach ($files['name'] as $index => $name) {
             if ($files['error'][$index] == 0 && $files['size'][$index] <= $maxFileSize) {
