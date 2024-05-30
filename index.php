@@ -206,39 +206,38 @@ if (isset($_GET["chat"])) {
         }
 
         .emoji-picker {
-            display: none;
-            position: absolute;
-            background: #fff;
-            border: 1px solid #ccc;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            padding: 10px;
-            border-radius: 5px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
+    position: absolute;
+    top: 28%;
+    right: 61.5%;
+    width: 400px; /* Ajuste la largeur selon tes préférences */
+    z-index: 1000; /* Assure que le menu d'émoji est au-dessus du contenu */
+    background-color: rgba(255, 255, 255, 0.9); /* Fond semi-transparent */
+    border-radius: 5px; /* Ajoute des coins arrondis */
+    height: 300px; /* Hauteur fixe */
+    overflow-y: auto; /* Ajoute une barre de défilement verticale si nécessaire */
+    display : none;
+}
 
-        .emoji-picker span {
-            cursor: pointer;
-            padding: 5px;
-            font-size: 20px;
-        }
+.emoji-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
 
-        .emoji-categories {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 10px;
-        }
+.emoji-list span {
+    cursor: pointer;
+    padding: 5px;
+    font-size: 20px;
+}
 
-        .emoji-category {
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-size: 20px;
-        }
+.emoji-categories{
+    display: flex;
+    justify-content: center; /* Centre les éléments sur l'axe horizontal */
+}
 
-        .emoji-list {
-            display: none;
-        }
+.emoji-category{
+    border : none;
+}
     </style>
 </head>
 <body>
