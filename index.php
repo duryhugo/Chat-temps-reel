@@ -147,12 +147,23 @@ if (isset($_GET["chat"])) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" type="text/css">
     <style>
-     .msg { list-style-type: none; }
+.msg {
+    list-style-type: none;
+}
+
+.msg .message-content {
+    display: block; /* Afficher chaque message sur une ligne entière */
+    overflow-wrap: break-word; /* Forcer un saut à la ligne en cas de débordement horizontal */
+    word-wrap: break-word; /* Fallback pour une prise en charge étendue */
+    white-space: pre-wrap; /* Permettre au texte de passer à la ligne en fonction de la largeur du conteneur */
+    word-break: break-all; /* Forcer les mots longs à être coupés et à continuer sur la ligne suivante si nécessaire */
+}
         .msg .nick { text-shadow: 1px 2px 3px red; }
         #chat {
             height: 500px;
             max-height: 500px;
             overflow-y: auto;
+            overflow-x: hidden;
             border: none;
             padding: 10px;
         }
@@ -408,7 +419,7 @@ if (isset($_GET["chat"])) {
 <span>🔓</span><span>🔏</span><span>🔐</span>
         </div>
         <div class="emoji-list" id="emoji-symbols" style="display: none;">
-        <span>🔣</span><span>🎌</span><span>🏳️‍🌈</span><span>🏴</span><span>🚩</span><span>💯</span><span>🔢</span>
+        <span>🔣</span><span>🎌</span><span>🏴</span><span>🚩</span><span>💯</span><span>🔢</span>
             <span>🆗</span><span>🔠</span><span>🔡</span><span>🔤</span><span>↗️</span><span>↘️</span><span>↙️</span><span>↖️</span>
         </div>
     </div>
@@ -512,39 +523,40 @@ emojiButton.addEventListener('click', function() {
     emojiPicker.style.display = emojiPicker.style.display === 'block' ? 'none' : 'block';
 });
 
-    async function fetchChat() {
-        try {
-            const response = await fetch(`?chat=1&last_id=${lastId}`);
-            const data = await response.json();
-            if (data.status !== 'no data') {
-                Object.keys(data).forEach(key => {
-                    const post = data[key];
-                    const row = document.createElement('div');
-                    row.dataset.id = key;
-                    let message = `<b>${post[0]}</b> `;
-                    message += `<span style="color:gray; font-size:smaller;">${post[2]}</span> `;
-                    message += `<span style="color:gray; font-size:smaller;">${post[3]}</span><br>`;
-                    if (post[1] != ""){
-                        message += `${post[1]} <br><br>`;
-                    }
-                    if (post[4]) {
-                        const files = post[4].split(',').map(file => file.trim());
-                        files.forEach(file => {
-                            message += `<a href="uploads/${file}" download>${file}</a><br>`;
-                        });
-                    }
-                    row.innerHTML = message;
-                    chatDiv.appendChild(row);
-                    lastId = key;
-                });
-            }
-            if (isScrolledToBottom || userSentMessage) {
-                chatDiv.scrollTop = chatDiv.scrollHeight;
-                userSentMessage = false;
-            }
-        } catch (error) {
-            console.error('Erreur lors de la récupération des messages:', error);
+async function fetchChat() {
+    try {
+        const response = await fetch(`?chat=1&last_id=${lastId}`);
+        const data = await response.json();
+        if (data.status !== 'no data') {
+            Object.keys(data).forEach(key => {
+                const post = data[key];
+                const row = document.createElement('div');
+                row.classList.add('msg'); // Ajoute la classe 'msg' à chaque message
+                row.dataset.id = key;
+                let message = `<b>${post[0]}</b> `;
+                message += `<span style="color:gray; font-size:smaller;">${post[2]}</span> `;
+                message += `<span style="color:gray; font-size:smaller;">${post[3]}</span><br>`;
+                if (post[1] != ""){
+                    message += `<div class="message-content">${post[1]}</div><br><br>`; // Encapsule le contenu du message dans une div avec la classe 'message-content'
+                }
+                if (post[4]) {
+                    const files = post[4].split(',').map(file => file.trim());
+                    files.forEach(file => {
+                        message += `<a href="uploads/${file}" download>${file}</a><br>`;
+                    });
+                }
+                row.innerHTML = message;
+                chatDiv.appendChild(row);
+                lastId = key;
+            });
         }
+        if (isScrolledToBottom || userSentMessage) {
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+            userSentMessage = false;
+        }
+    } catch (error) {
+        console.error('Erreur lors de la récupération des messages:', error);
+    }
     }
 
     form.addEventListener('submit', async function(event) {
