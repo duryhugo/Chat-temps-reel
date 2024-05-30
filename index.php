@@ -145,7 +145,7 @@ if (isset($_GET["chat"])) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" type="text/css">
     <style>
-        .msg { list-style-type: none; }
+     .msg { list-style-type: none; }
         .msg .nick { text-shadow: 1px 2px 3px red; }
         #chat {
             height: 500px;
@@ -220,6 +220,23 @@ if (isset($_GET["chat"])) {
             padding: 5px;
             font-size: 20px;
         }
+
+        .emoji-categories {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 10px;
+        }
+
+        .emoji-category {
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 20px;
+        }
+
+        .emoji-list {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -254,11 +271,145 @@ if (isset($_GET["chat"])) {
     </div>
 
     <div class="emoji-picker" id="emoji-picker">
-        <!-- Liste d'emojis -->
-        <span>😊</span><span>❤️</span><span>😂</span><span>😍</span><span>😎</span><span>👍</span><span>🎉</span>
-        <span>🌟</span><span>🔥</span><span>🙌</span><span>😄</span><span>😘</span><span>😉</span><span>😁</span>
-        <span>😀</span><span>😃</span><span>😇</span><span>😆</span><span>😋</span><span>😌</span><span>😏</span>
-        <!-- Ajoutez d'autres emojis ici -->
+        <!-- Boutons de catégories d'emojis -->
+        <div class="emoji-categories">
+            <button class="emoji-category" data-category="smileys">😊</button>
+            <button class="emoji-category" data-category="hearts">❤️</button>
+            <button class="emoji-category" data-category="animals">🐶</button>
+            <button class="emoji-category" data-category="foods">🍏</button>
+            <button class="emoji-category" data-category="activities">⚽</button>
+            <button class="emoji-category" data-category="places">🚗</button>
+            <button class="emoji-category" data-category="objects">💡</button>
+            <button class="emoji-category" data-category="symbols">🔣</button>
+        </div>
+        <!-- Emojis classés par catégories -->
+        <div class="emoji-list" id="emoji-smileys" style="display: block;">
+        <span>👋</span><span>🤚</span><span>🖐️</span><span>✋</span><span>🖖</span><span>👌</span><span>🤏</span>
+<span>✌️</span><span>🤞</span><span>🤟</span><span>🤘</span><span>🤙</span><span>👈</span><span>👉</span>
+<span>👆</span><span>👇</span><span>☝️</span><span>👍</span><span>👎</span><span>✊</span><span>👊</span>
+<span>🤛</span><span>🤜</span><span>👏</span><span>🙌</span><span>👐</span><span>🤲</span><span>🤝</span>
+<span>🙏</span><span>✍️</span><span>💅</span><span>🤳</span><span>💪</span><span>😃</span><span>😄</span><span>😁</span><span>😆</span><span>😅</span><span>😂</span><span>🤣</span>
+            <span>😊</span><span>😇</span><span>🙂</span><span>🙃</span><span>😉</span><span>😌</span><span>😍</span>
+            <span>😘</span><span>😗</span><span>😙</span><span>😚</span><span>😋</span><span>😛</span><span>😝</span>
+            <span>😜</span><span>🤪</span><span>🤨</span><span>🧐</span><span>🤓</span><span>😎</span><span>🤩</span>
+            <span>😏</span><span>😒</span><span>😞</span><span>😔</span><span>😟</span><span>😕</span><span>🙁</span>
+            <span>😣</span><span>😖</span><span>😫</span><span>😩</span><span>😤</span><span>😠</span><span>😡</span>
+            <span>🤬</span><span>😈</span><span>👿</span><span>💀</span><span>☠️</span><span>💩</span><span>🤡</span>
+            <span>👹</span><span>👺</span><span>👻</span><span>👽</span><span>👾</span><span>🤖</span><span>😺</span>
+            <span>😸</span><span>😹</span><span>😻</span><span>😼</span><span>😽</span><span>🙀</span><span>😿</span>
+            <span>😾</span><span>🙈</span><span>🙉</span><span>🙊</span>
+        </div>
+        <div class="emoji-list" id="emoji-hearts" style="display: none;">
+        <span>💓</span><span>💔</span><span>❣️</span><span>💕</span><span>💖</span><span>💗</span><span>💘</span>
+<span>💝</span><span>💞</span><span>💟</span><span>❤️</span><span>🧡</span><span>💛</span><span>💚</span>
+<span>💙</span><span>💜</span><span>🤎</span><span>🖤</span><span>🤍</span>
+        </div>
+        <div class="emoji-list" id="emoji-animals" style="display: none;">
+        <span>🐶</span><span>🐱</span><span>🐭</span><span>🐹</span><span>🐰</span><span>🦊</span><span>🦝</span>
+<span>🐻</span><span>🐼</span><span>🦄</span><span>🐯</span><span>🐸</span><span>🐷</span><span>🐮</span>
+<span>🐗</span><span>🐵</span><span>🐒</span><span>🦍</span><span>🦧</span><span>🐺</span><span>🦊</span>
+<span>🦝</span><span>🐴</span><span>🦓</span><span>🦌</span><span>🐃</span><span>🐄</span><span>🐎</span>
+<span>🐖</span><span>🐏</span><span>🐑</span><span>🐐</span><span>🦙</span><span>🦘</span><span>🦥</span>
+<span>🦨</span><span>🦡</span><span>🐕</span><span>🦮</span><span>🐕‍🦺</span><span>🐩</span><span>🐺</span>
+<span>🦮</span><span>🦺</span><span>🐈‍⬛</span><span>🐾</span><span>🦥</span><span>🦦</span><span>🦇</span>
+<span>🐻‍❄️</span><span>🐨</span><span>🐼</span><span>🦥</span><span>🦦</span><span>🦧</span><span>🦨</span>
+<span>🦘</span><span>🦡</span><span>🐦</span><span>🦉</span><span>🦢</span><span>🦩</span><span>🦚</span>
+<span>🦜</span><span>🐧</span><span>🕊️</span><span>🦤</span><span>🦆</span><span>🦅</span><span>🦉</span>
+<span>🦩</span><span>🦚</span><span>🦜</span><span>🕊️</span><span>🐔</span><span>🐓</span><span>🐣</span>
+<span>🐤</span><span>🐥</span><span>🐦</span><span>🦅</span><span>🦆</span><span>🦢</span><span>🦜</span>
+<span>🦩</span><span>🦚</span><span>🦜</span><span>🕊️</span><span>🐍</span><span>🐢</span><span>🦎</span>
+<span>🦖</span><span>🦕</span><span>🐙</span><span>🦑</span><span>🦐</span><span>🦞</span><span>🦀</span>
+<span>🐡</span><span>🐠</span><span>🐟</span><span>🐬</span><span>🐳</span><span>🐋</span><span>🦈</span>
+<span>🐊</span><span>🐅</span><span>🐆</span><span>🦓</span><span>🦍</span><span>🐘</span><span>🦛</span>
+<span>🦏</span><span>🐪</span><span>🐫</span><span>🦒</span><span>🦘</span><span>🐃</span><span>🐂</span>
+<span>🐄</span><span>🐎</span><span>🐖</span><span>🐏</span><span>🐑</span><span>🐐</span><span>🦙</span>
+<span>🦌</span><span>🐕</span><span>🐩</span><span>🐈</span><span>🐓</span><span>🦃</span><span>🦚</span>
+<span>🦜</span><span>🦢</span><span>🦩</span><span>🦚</span><span>🦜</span><span>🕊️</span>
+    </div>
+<div class="emoji-list" id="emoji-foods" style="display: none;">
+        <span>🍏</span><span>🍎</span><span>🍐</span><span>🍊</span><span>🍋</span><span>🍌</span><span>🍉</span>
+            <span>🍇</span><span>🍓</span><span>🍈</span><span>🍒</span><span>🍑</span><span>🍍</span><span>🥭</span><span>🥥</span>
+            <span>🥦</span><span>🥑</span><span>🥝</span><span>🥬</span><span>🥒</span><span>🌶️</span><span>🫑</span><span>🌽</span>
+            <span>🥕</span><span>🫒</span><span>🍆</span><span>🥔</span><span>🍠</span><span>🌰</span><span>🥜</span><span>🍯</span>
+            <span>🥐</span><span>🍞</span><span>🥖</span><span>🫓</span><span>🥨</span><span>🥯</span><span>🥞</span><span>🧇</span>
+            <span>🧀</span><span>🍖</span><span>🍗</span><span>🥩</span><span>🥓</span><span>🍔</span><span>🍟</span><span>🍕</span>
+            <span>🌭</span><span>🥪</span><span>🌮</span><span>🌯</span><span>🫔</span><span>🥙</span><span>🧆</span><span>🥚</span>
+            <span>🍳</span><span>🥘</span><span>🍲</span><span>🫕</span><span>🥣</span><span>🥗</span><span>🍿</span><span>🧈</span>
+            <span>🧂</span><span>🥫</span><span>🍱</span><span>🍘</span><span>🍙</span><span>🍚</span><span>🍛</span><span>🍜</span>
+            <span>🍝</span><span>🍠</span><span>🍢</span><span>🍣</span><span>🍤</span><span>🍥</span><span>🥮</span><span>🍡</span>
+            <span>🥟</span><span>🥠</span><span>🥡</span><span>🦀</span><span>🦞</span><span>🦐</span><span>🦑</span><span>🦪</span>
+            <span>🍦</span><span>🍧</span><span>🍨</span><span>🍩</span><span>🍪</span><span>🎂</span><span>🍰</span><span>🧁</span>
+            <span>🥧</span><span>🍫</span><span>🍬</span><span>🍭</span><span>🍮</span><span>🍯</span><span>🍼</span><span>🥤</span>
+            <span>🧃</span><span>🧉</span><span>🧊</span><span>🥛</span><span>🍵</span><span>🍶</span><span>🍾</span><span>🍷</span>
+            <span>🍸</span><span>🍹</span><span>🍺</span><span>🍻</span><span>🥂</span><span>🥃</span><span>🥤</span><span>🧋</span>
+            <span>🧊</span><span>🥢</span><span>🍽️</span><span>🍴</span><span>🥄</span><span>🔪</span><span>🏺</span><span>🌍</span>
+    </div>
+        <div class="emoji-list" id="emoji-activities" style="display: none;">
+        <span>⚽</span><span>🏀</span><span>🏈</span><span>⚾</span><span>🎾</span><span>🏐</span><span>🏉</span>
+            <span>🎱</span><span>🏓</span><span>🏸</span><span>🥅</span><span>🥊</span><span>🥋</span><span>🎽</span><span>⛷️</span>
+            <span>🏂</span><span>🪂</span><span>🏋️</span><span>🏋️‍♂️</span><span>🏋️‍♀️</span><span>🤼</span><span>🤼‍♂️</span>
+            <span>🤼‍♀️</span><span>🤸</span><span>🤸‍♂️</span><span>🤸‍♀️</span><span>⛹️</span><span>⛹️‍♂️</span>
+            <span>⛹️‍♀️</span><span>🤺</span><span>🤾</span><span>🤾‍♂️</span><span>🤾‍♀️</span><span>🏌️</span>
+            <span>🏌️‍♂️</span><span>🏌️‍♀️</span><span>🏇</span><span>🧘</span><span>🧘‍♂️</span><span>🧘‍♀️</span><span>🏄</span><span>🏄‍♂️</span>
+            <span>🏄‍♀️</span><span>🏊</span><span>🏊‍♂️</span><span>🏊‍♀️</span><span>⛹️</span><span>⛹️‍♂️</span>
+            <span>⛹️‍♀️</span><span>🏋️</span><span>🏋️‍♂️</span><span>🏋️‍♀️</span><span>🚴</span><span>🚴‍♂️</span>
+            <span>🚴‍♀️</span><span>🚵</span><span>🚵‍♂️</span><span>🚵‍♀️</span><span>🤹</span><span>🤹‍♂️</span>
+            <span>🤹‍♀️</span><span>🤾</span><span>🤾‍♂️</span><span>🤾‍♀️</span><span>🧗</span><span>🧗‍♂️</span>
+            <span>🧗‍♀️</span><span>🚣</span><span>🚣‍♂️</span><span>🚣‍♀️</span><span>🧘</span><span>🧘‍♂️</span>
+            <span>🧘‍♀️</span><span>🛀</span><span>🛌</span><span>🧑‍🤝‍🧑</span><span>👫</span><span>👬</span>
+            <span>👭</span><span>💏</span><span>👩‍❤️‍💋‍👨</span><span>👨‍❤️‍💋‍👨</span><span>👩‍❤️‍💋‍👩</span>
+            <span>💑</span><span>👩‍❤️‍👨</span><span>👨‍❤️‍👨</span><span>👩‍❤️‍👩</span><span>👪</span><span>👨‍👩‍👦</span>
+            <span>👨‍👩‍👧</span><span>👨‍👩‍👧‍👦</span><span>👨‍👩‍👦‍👦</span><span>👨‍👩‍👧‍👧</span><span>👩‍👩‍👦</span>
+            <span>👩‍👩‍👧</span><span>👩‍👩‍👧‍👦</span><span>👩‍👩‍👦‍👦</span><span>👩‍👩‍👧‍👧</span><span>👨‍👨‍👦</span>
+            <span>👨‍👨‍👧</span><span>👨‍👨‍👧‍👦</span><span>👨‍👨‍👦‍👦</span><span>👨‍👨‍👧‍👧</span><span>👩‍👦</span>
+            <span>👩‍👧</span><span>👩‍👧‍👦</span><span>👩‍👦‍👦</span><span>👩‍👧‍👧</span><span>👨‍👦</span><span>👨‍👧</span>
+            <span>👨‍👧‍👦</span><span>👨‍👦‍👦</span><span>👨‍👧‍👧</span><span>👚</span><span>👕</span><span>🥼</span>
+            <span>🦺</span><span>👔</span><span>👗</span><span>🩱</span><span>👖</span><span>🩲</span><span>🩳</span>
+            <span>👘</span><span>🥻</span><span>🩴</span><span>🥿</span><span>👠</span><span>👡</span><span>👢</span>
+            <span>👞</span><span>👟</span><span>🥾</span><span>🧦</span><span>🧤</span><span>🧣</span><span>🎩</span>
+            <span>🧢</span><span>👒</span><span>🎓</span><span>⛑️</span><span>🪖</span><span>💼</span><span>🧳</span>
+            <span>👜</span><span>👝</span><span>🛍️</span><span>🎒</span><span>👑</span><span>🧢</span><span>📿</span>
+            <span>💄</span><span>💍</span><span>💎</span><span>🔇</span><span>🔈</span><span>🔉</span><span>🔊</span>
+        </div>
+        <div class="emoji-list" id="emoji-places" style="display: none;">
+        <span>🚗</span><span>🚕</span><span>🚙</span><span>🚌</span><span>🚎</span><span>🏎️</span><span>🚓</span>
+<span>🚑</span><span>🚒</span><span>🚐</span><span>🚚</span><span>🚛</span><span>🚜</span><span>🛴</span><span>🚲</span>
+<span>🛵</span><span>🏍️</span><span>🚨</span><span>🚔</span><span>🚍</span><span>🚘</span><span>🚖</span><span>🚡</span>
+<span>🚠</span><span>🚟</span><span>🚃</span><span>🚋</span><span>🚞</span><span>🚝</span><span>🚄</span><span>🚅</span>
+<span>🚈</span><span>🚂</span><span>🚆</span><span>🚇</span><span>🚊</span><span>🚉</span><span>🚁</span><span>🛩️</span>
+<span>✈️</span><span>🛫</span><span>🛬</span><span>🪂</span><span>🚀</span><span>🛸</span><span>🛶</span><span>⛵</span>
+<span>🚤</span><span>🛥️</span><span>🚢</span><span>⛴️</span><span>🚁</span><span>🚟</span><span>🚡</span><span>🚲</span>
+        </div>
+        <div class="emoji-list" id="emoji-objects" style="display: none;">
+        <span>💡</span><span>🔦</span><span>🕯️</span><span>🛢️</span><span>🔑</span><span>🔨</span><span>🚪</span>
+<span>🛏️</span><span>🛋️</span><span>🚽</span><span>🚿</span><span>🛁</span><span>🧴</span><span>🧽</span><span>🧻</span>
+<span>🏠</span><span>🏡</span><span>🏢</span><span>🏣</span><span>🏤</span><span>🏥</span><span>🏦</span><span>🏨</span>
+<span>🏩</span><span>🏪</span><span>🏫</span><span>🏬</span><span>🏭</span><span>🏯</span><span>🏰</span><span>💒</span>
+<span>🗼</span><span>🗽</span><span>⛪</span><span>🕌</span><span>🛕</span><span>🕍</span><span>⛩️</span><span>🕋</span>
+<span>⛲</span><span>⛺</span><span>🌁</span><span>🌃</span><span>🏙️</span><span>🌄</span><span>🌅</span><span>🌆</span>
+<span>🌇</span><span>🌉</span><span>🌌</span><span>🎠</span><span>🎡</span><span>🎢</span><span>💈</span><span>🎪</span>
+<span>🚂</span><span>🚃</span><span>🚄</span><span>🚅</span><span>🚆</span><span>🚇</span><span>🚈</span><span>🚉</span>
+<span>🚊</span><span>🚝</span><span>🚞</span><span>🚋</span><span>🚌</span><span>🚍</span><span>🚎</span><span>🚐</span>
+<span>🚑</span><span>🚒</span><span>🚓</span><span>🚔</span><span>🚕</span><span>🚖</span><span>🚗</span><span>🚘</span>
+<span>🚚</span><span>🚛</span><span>🚜</span><span>🛴</span><span>🛵</span><span>🚲</span><span>🛵</span><span>🛴</span>
+<span>🚏</span><span>🛤️</span><span>🛣️</span><span>🛢️</span><span>⛽</span><span>🚨</span><span>🚥</span><span>🚦</span>
+<span>🛑</span><span>🚧</span><span>⚓</span><span>⛵</span><span>🛶</span><span>🚤</span><span>🛳️</span><span>⛴️</span>
+<span>🛥️</span><span>✈️</span><span>🛩️</span><span>🛫</span><span>🛬</span><span>🪂</span><span>💺</span><span>🚁</span>
+<span>🚟</span><span>🚡</span><span>🚠</span><span>🛰️</span><span>🚀</span><span>🛸</span><span>🌠</span><span>🌌</span>
+<span>⛺</span><span>🏠</span><span>🏡</span><span>🏢</span><span>🏣</span><span>🏤</span><span>🏥</span><span>🏦</span>
+<span>🏨</span><span>🏩</span><span>🏪</span><span>🏫</span><span>🏬</span><span>🏭</span><span>🏯</span><span>🏰</span>
+<span>💒</span><span>🗼</span><span>🗽</span><span>🕋</span><span>⛪</span><span>🕌</span><span>🛕</span><span>🕍</span>
+<span>🏟️</span><span>🏛️</span><span>🏗️</span><span>🧱</span><span>🪨</span><span>🔩</span><span>⚙️</span><span>⛓️</span>
+<span>🧰</span><span>🔨</span><span>🪚</span><span>🪛</span><span>🔧</span><span>🔩</span><span>⚒️</span><span>🛠️</span>
+<span>⛏️</span><span>🪓</span><span>🔪</span><span>🗡️</span><span>⚔️</span><span>🛡️</span><span>🚪</span><span>🛏️</span>
+<span>🛋️</span><span>🪑</span><span>🚽</span><span>🚿</span><span>🛁</span><span>🪒</span><span>🧴</span><span>🧽</span>
+<span>🧻</span><span>🧼</span><span>🛎️</span><span>🔑</span><span>🗝️</span><span>🚪</span><span>🛋️</span><span>🔒</span>
+<span>🔓</span><span>🔏</span><span>🔐</span>
+        </div>
+        <div class="emoji-list" id="emoji-symbols" style="display: none;">
+        <span>🔣</span><span>🎌</span><span>🏳️‍🌈</span><span>🏴</span><span>🚩</span><span>💯</span><span>🔢</span>
+            <span>🆗</span><span>🔠</span><span>🔡</span><span>🔤</span><span>↗️</span><span>↘️</span><span>↙️</span><span>↖️</span>
+        </div>
     </div>
 
     <div class="context-menu" id="context-menu">
@@ -337,16 +488,28 @@ if (isset($_GET["chat"])) {
         }
     });
 
-    emojiButton.addEventListener('click', function() {
-        emojiPicker.style.display = emojiPicker.style.display === 'block' ? 'none' : 'block';
+    document.querySelectorAll('.emoji-category').forEach(button => {
+    button.addEventListener('click', function() {
+        // Masquer toutes les listes d'emojis
+        document.querySelectorAll('.emoji-list').forEach(list => list.style.display = 'none');
+        
+        // Afficher la liste d'emojis correspondant à la catégorie sélectionnée
+        const category = this.dataset.category;
+        document.getElementById(`emoji-${category}`).style.display = 'block';
     });
+});
 
-    emojiPicker.addEventListener('click', function(event) {
-        if (event.target.tagName === 'SPAN') {
-            textarea.value += event.target.textContent;
-            emojiPicker.style.display = 'none';
-        }
-    });
+emojiPicker.addEventListener('click', function(event) {
+    if (event.target.tagName === 'SPAN') {
+        textarea.value += event.target.textContent;
+        emojiPicker.style.display = 'none';
+    }
+});
+
+// Afficher l'emoji picker au clic sur le bouton des emojis
+emojiButton.addEventListener('click', function() {
+    emojiPicker.style.display = emojiPicker.style.display === 'block' ? 'none' : 'block';
+});
 
     async function fetchChat() {
         try {
