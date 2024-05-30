@@ -249,6 +249,18 @@ if (isset($_GET["chat"])) {
 .emoji-category{
     border : none;
 }
+
+.file-entry {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.file-entry span {
+    margin-left: 10px;
+    cursor: pointer;
+    color: red;
+}
     </style>
 </head>
 <body>
@@ -430,7 +442,7 @@ if (isset($_GET["chat"])) {
 </div>
 
 <script>
- let lastId = -1;
+let lastId = -1;
 let isScrolledToBottom = true;
 let userSentMessage = false;
 let messageToDelete = null;
@@ -456,14 +468,17 @@ document.getElementById('file-input').addEventListener('change', function() {
     const fileNameDiv = document.getElementById('file-name');
     const files = fileInput.files;
 
-    if (files.length > 0) {
-        let fileNames = '';
-        for (let i = 0; i < files.length; i++) {
-            fileNames += files[i].name + (i < files.length - 1 ? ', ' : '');
-        }
-        fileNameDiv.textContent = `Fichiers sélectionnés: ${fileNames}`;
-    } else {
-        fileNameDiv.textContent = '';
+    fileNameDiv.innerHTML = '';
+
+    for (let i = 0; i < files.length; i++) {
+        const fileEntry = document.createElement('div');
+        fileEntry.classList.add('file-entry');
+        fileEntry.innerHTML = `${files[i].name} <span data-index="${i}">✖</span>`;
+        fileNameDiv.appendChild(fileEntry);
+
+        fileEntry.querySelector('span').addEventListener('click', function() {
+            removeFile(i);
+        });
     }
 });
 
@@ -502,10 +517,7 @@ deleteButton.addEventListener('click', async function() {
 
 document.querySelectorAll('.emoji-category').forEach(button => {
     button.addEventListener('click', function() {
-        // Masquer toutes les listes d'emojis
         document.querySelectorAll('.emoji-list').forEach(list => list.style.display = 'none');
-        
-        // Afficher la liste d'emojis correspondant à la catégorie sélectionnée
         const category = this.dataset.category;
         document.getElementById(`emoji-${category}`).style.display = 'block';
     });
@@ -518,7 +530,6 @@ emojiPicker.addEventListener('click', function(event) {
     }
 });
 
-// Afficher l'emoji picker au clic sur le bouton des emojis
 emojiButton.addEventListener('click', function() {
     emojiPicker.style.display = emojiPicker.style.display === 'block' ? 'none' : 'block';
 });
@@ -531,13 +542,13 @@ async function fetchChat() {
             Object.keys(data).forEach(key => {
                 const post = data[key];
                 const row = document.createElement('div');
-                row.classList.add('msg'); // Ajoute la classe 'msg' à chaque message
+                row.classList.add('msg');
                 row.dataset.id = key;
                 let message = `<b>${post[0]}</b> `;
                 message += `<span style="color:gray; font-size:smaller;">${post[2]}</span> `;
                 message += `<span style="color:gray; font-size:smaller;">${post[3]}</span><br>`;
                 if (post[1] != ""){
-                    message += `<div class="message-content">${post[1]}</div><br><br>`; // Encapsule le contenu du message dans une div avec la classe 'message-content'
+                    message += `<div class="message-content">${post[1]}</div><br><br>`;
                 }
                 if (post[4]) {
                     const files = post[4].split(',').map(file => file.trim());
@@ -568,15 +579,48 @@ form.addEventListener('submit', async function(event) {
             body: formData
         });
         form.reset();
-        document.getElementById('file-name').textContent = ''; // Réinitialise le message des fichiers sélectionnés
+        document.getElementById('file-name').textContent = '';
         userSentMessage = true;
     } catch (error) {
         console.error('Erreur lors de l\'envoi du message:', error);
     }
 });
 
+function removeFile(index) {
+    const fileInput = document.getElementById('file-input');
+    const dataTransfer = new DataTransfer();
+
+    const files = fileInput.files;
+
+    for (let i = 0; i < files.length; i++) {
+        if (i !== index) {
+            dataTransfer.items.add(files[i]);
+        }
+    }
+
+    fileInput.files = dataTransfer.files;
+
+    // Mettre à jour la vue des fichiers
+    const fileNameDiv = document.getElementById('file-name');
+    fileNameDiv.innerHTML = '';
+
+    for (let i = 0; i < fileInput.files.length; i++) {
+        const fileEntry = document.createElement('div');
+        fileEntry.classList.add('file-entry');
+        fileEntry.innerHTML = `${fileInput.files[i].name} <span data-index="${i}">✖</span>`;
+        fileNameDiv.appendChild(fileEntry);
+
+        fileEntry.querySelector('span').addEventListener('click', function() {
+            removeFile(i);
+        });
+    }
+}
+
 fetchChat();
 setInterval(fetchChat, 2000);
+</script>
+</body>
+</html>
 </script>
 </body>
 </html>
