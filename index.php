@@ -430,77 +430,77 @@ if (isset($_GET["chat"])) {
 </div>
 
 <script>
-    let lastId = -1;
-    let isScrolledToBottom = true;
-    let userSentMessage = false;
-    let messageToDelete = null;
+ let lastId = -1;
+let isScrolledToBottom = true;
+let userSentMessage = false;
+let messageToDelete = null;
 
-    const chatDiv = document.getElementById('chat');
-    const contextMenu = document.getElementById('context-menu');
-    const deleteButton = document.getElementById('delete-message');
-    const emojiButton = document.getElementById('emoji-button');
-    const emojiPicker = document.getElementById('emoji-picker');
-    const textarea = document.querySelector('textarea[name="chat"]');
-    const form = document.getElementById('input-chat');
+const chatDiv = document.getElementById('chat');
+const contextMenu = document.getElementById('context-menu');
+const deleteButton = document.getElementById('delete-message');
+const emojiButton = document.getElementById('emoji-button');
+const emojiPicker = document.getElementById('emoji-picker');
+const textarea = document.querySelector('textarea[name="chat"]');
+const form = document.getElementById('input-chat');
 
-    chatDiv.addEventListener('scroll', function() {
-        isScrolledToBottom = chatDiv.scrollHeight - chatDiv.scrollTop === chatDiv.clientHeight;
-    });
+chatDiv.addEventListener('scroll', function() {
+    isScrolledToBottom = chatDiv.scrollHeight - chatDiv.scrollTop === chatDiv.clientHeight;
+});
 
-    document.getElementById('file-button').addEventListener('click', function() {
-        document.getElementById('file-input').click();
-    });
+document.getElementById('file-button').addEventListener('click', function() {
+    document.getElementById('file-input').click();
+});
 
-    document.getElementById('file-input').addEventListener('change', function() {
-        const fileInput = document.getElementById('file-input');
-        const fileNameDiv = document.getElementById('file-name');
-        const files = fileInput.files;
+document.getElementById('file-input').addEventListener('change', function() {
+    const fileInput = document.getElementById('file-input');
+    const fileNameDiv = document.getElementById('file-name');
+    const files = fileInput.files;
 
-        if (files.length > 0) {
-            let fileNames = '';
-            for (let i = 0; i < files.length; i++) {
-                fileNames += files[i].name + (i < files.length - 1 ? ', ' : '');
-            }
-            fileNameDiv.textContent = `Fichiers sélectionnés: ${fileNames}`;
-        } else {
-            fileNameDiv.textContent = '';
+    if (files.length > 0) {
+        let fileNames = '';
+        for (let i = 0; i < files.length; i++) {
+            fileNames += files[i].name + (i < files.length - 1 ? ', ' : '');
         }
-    });
+        fileNameDiv.textContent = `Fichiers sélectionnés: ${fileNames}`;
+    } else {
+        fileNameDiv.textContent = '';
+    }
+});
 
-    textarea.addEventListener('keypress', function(event) {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            form.dispatchEvent(new Event('submit', { cancelable: true }));
-        }
-    });
-
-    chatDiv.addEventListener('contextmenu', function(event) {
+textarea.addEventListener('keypress', function(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault();
-        const target = event.target.closest('div');
-        if (target) {
-            messageToDelete = target;
-            contextMenu.style.top = `${event.clientY}px`;
-            contextMenu.style.left = `${event.clientX}px`;
-            contextMenu.style.display = 'block';
-        }
-    });
+        form.dispatchEvent(new Event('submit', { cancelable: true }));
+    }
+});
 
-    document.addEventListener('click', function() {
-        contextMenu.style.display = 'none';
-    });
+chatDiv.addEventListener('contextmenu', function(event) {
+    event.preventDefault();
+    const target = event.target.closest('div');
+    if (target) {
+        messageToDelete = target;
+        contextMenu.style.top = `${event.clientY}px`;
+        contextMenu.style.left = `${event.clientX}px`;
+        contextMenu.style.display = 'block';
+    }
+});
 
-    deleteButton.addEventListener('click', async function() {
-        if (messageToDelete) {
-            const messageId = messageToDelete.dataset.id;
-            await fetch(`?delete=${messageId}`, {
-                method: 'POST'
-            });
-            messageToDelete.remove();
-            messageToDelete = null;
-        }
-    });
+document.addEventListener('click', function() {
+    contextMenu.style.display = 'none';
+});
 
-    document.querySelectorAll('.emoji-category').forEach(button => {
+deleteButton.addEventListener('click', async function() {
+    if (messageToDelete) {
+        const messageId = messageToDelete.dataset.id;
+        await fetch(`?delete=${messageId}`, {
+            method: 'POST'
+        });
+        messageToDelete.remove();
+        messageToDelete = null;
+    }
+});
+
+document.querySelectorAll('.emoji-category').forEach(button => {
     button.addEventListener('click', function() {
         // Masquer toutes les listes d'emojis
         document.querySelectorAll('.emoji-list').forEach(list => list.style.display = 'none');
@@ -557,25 +557,26 @@ async function fetchChat() {
     } catch (error) {
         console.error('Erreur lors de la récupération des messages:', error);
     }
+}
+
+form.addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const formData = new FormData(form);
+    try {
+        await fetch('', {
+            method: 'POST',
+            body: formData
+        });
+        form.reset();
+        document.getElementById('file-name').textContent = ''; // Réinitialise le message des fichiers sélectionnés
+        userSentMessage = true;
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi du message:', error);
     }
+});
 
-    form.addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const formData = new FormData(form);
-        try {
-            await fetch('', {
-                method: 'POST',
-                body: formData
-            });
-            form.reset();
-            userSentMessage = true;
-        } catch (error) {
-            console.error('Erreur lors de l\'envoi du message:', error);
-        }
-    });
-
-    fetchChat();
-    setInterval(fetchChat, 2000);
+fetchChat();
+setInterval(fetchChat, 2000);
 </script>
 </body>
 </html>
