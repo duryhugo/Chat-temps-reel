@@ -64,6 +64,34 @@ function send_chat($nick, $chat, $files = null) {
     fclose($fopen_w);
 }
 
+function delete_chat($id) {
+    $filename = "chat.json";
+    if (!file_exists($filename)) {
+        return;
+    }
+
+    $fopen = fopen($filename, "r");
+    if (flock($fopen, LOCK_SH)) {
+        $fgets = fgets($fopen);
+        flock($fopen, LOCK_UN);
+    }
+    fclose($fopen);
+    $decode = json_decode($fgets, true);
+
+    if (isset($decode[$id])) {
+        unset($decode[$id]);
+        $decode = array_values($decode); // Réindexe le tableau
+        $encode = json_encode($decode);
+
+        $fopen_w = fopen($filename, "w");
+        if (flock($fopen_w, LOCK_EX)) {
+            fwrite($fopen_w, $encode);
+            flock($fopen_w, LOCK_UN);
+        }
+        fclose($fopen_w);
+    }
+}
+
 function show_chat($last_id = -1) {
     $filename = "chat.json";
     if (!file_exists($filename)) {
@@ -93,6 +121,12 @@ if ((isset($_POST["chat"]) && $_POST["chat"] != "") || (isset($_FILES['files']) 
     $chat = isset($_POST["chat"]) ? $_POST["chat"] : "";
     $files = isset($_FILES['files']) ? $_FILES['files'] : null;
     send_chat($nick, $chat, $files);
+}
+
+if (isset($_POST["delete"])) {
+    $id = intval($_POST["delete"]);
+    delete_chat($id);
+    exit;
 }
 
 if (isset($_GET["chat"])) {
@@ -146,6 +180,27 @@ if (isset($_GET["chat"])) {
             background : white;
             border : none;
         }
+
+        /* Styles pour le menu contextuel */
+        .context-menu {
+            display: none;
+            position: absolute;
+            z-index: 1000;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .context-menu button {
+            padding: 8px 12px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+        .context-menu button:hover {
+            background-color: #f0f0f0;
+        }
     </style>
 </head>
 <body>
@@ -180,12 +235,20 @@ if (isset($_GET["chat"])) {
         </div>
     </div>
 
+    <!-- Menu contextuel pour la suppression des messages -->
+    <div class="context-menu" id="context-menu">
+        <button id="delete-message">Supprimer le message</button>
+    </div>
+
     <script>
         let lastId = -1;
         let isScrolledToBottom = true;
         let userSentMessage = false;
+        let messageToDelete = null;
 
         const chatDiv = document.getElementById('chat');
+        const contextMenu = document.getElementById('context-menu');
+        const deleteButton = document.getElementById('delete-message');
 
         chatDiv.addEventListener('scroll', function() {
             isScrolledToBottom = chatDiv.scrollHeight - chatDiv.scrollTop === chatDiv.clientHeight;
@@ -218,6 +281,32 @@ if (isset($_GET["chat"])) {
             }
         });
 
+        chatDiv.addEventListener('contextmenu', function(event) {
+            event.preventDefault();
+            const target = event.target.closest('div');
+            if (target) {
+                messageToDelete = target;
+                contextMenu.style.top = `${event.clientY}px`;
+                contextMenu.style.left = `${event.clientX}px`;
+                contextMenu.style.display = 'block';
+            }
+        });
+
+        document.addEventListener('click', function() {
+            contextMenu.style.display = 'none';
+        });
+
+        deleteButton.addEventListener('click', async function() {
+            if (messageToDelete) {
+                const messageId = messageToDelete.dataset.id;
+                await fetch(`?delete=${messageId}`, {
+                    method: 'POST'
+                });
+                messageToDelete.remove();
+                messageToDelete = null;
+            }
+        });
+
         async function fetchChat() {
             try {
                 const response = await fetch(`?chat=1&last_id=${lastId}`);
@@ -226,6 +315,7 @@ if (isset($_GET["chat"])) {
                     Object.keys(data).forEach(key => {
                         const post = data[key];
                         const row = document.createElement('div');
+                        row.dataset.id = key;
                         let message = `<b>${post[0]}</b> `;
                         message += `<span style="color:gray; font-size:smaller;">${post[2]}</span> `;
                         message += `<span style="color:gray; font-size:smaller;">${post[3]}</span><br>`;
