@@ -261,6 +261,30 @@ if (isset($_GET["chat"])) {
     cursor: pointer;
     color: red;
 }
+
+.profile-and-message {
+    display: flex;
+    align-items: flex-start; /* Alignez les éléments en haut */
+}
+
+.profile-circle {
+    width: 35px; /* Fixez la largeur de l'élément contenant la photo de profil */
+    height: 25px; /* Fixez la hauteur de l'élément contenant la photo de profil */
+    margin-right: 8px; /* Ajustez la marge pour aligner la photo de profil avec le texte */
+    margin-bottom: 35px;
+}
+
+.profile-circle img {
+    border-radius: 50%; /* Pour rendre l'image ronde */
+    border: 2px solid #fff; /* Bordure blanche autour de l'image */    
+    width: 25px; /* Fixez une largeur absolue */
+    height: 25px; /* Fixez une hauteur absolue */
+}
+
+.message-content {
+    flex-grow: 1; /* Permettre au contenu du message de remplir l'espace restant */
+    max-width: calc(100% - 33px); /* Ajustez la largeur du texte pour éviter le chevauchement avec l'image */
+}
     </style>
 </head>
 <body>
@@ -548,11 +572,19 @@ async function fetchChat() {
                 const row = document.createElement('div');
                 row.classList.add('msg');
                 row.dataset.id = key;
-                let message = `<b>${post[0]}</b> `;
+
+                let message = `<div class="profile-and-message">`;
+                if (post[0] === 'Hugo') {
+                    message += `<div class="profile-circle">`;
+                    message += `<img src="avatars/kaaris.jpg" alt="Photo de profil de Hugo">`;
+                    message += `</div>`;
+                }
+                message += `<div class="message-content">`;
+                message += `<b>${post[0]}</b> `;
                 message += `<span style="color:gray; font-size:smaller;">${post[2]}</span> `;
                 message += `<span style="color:gray; font-size:smaller;">${post[3]}</span><br>`;
-                if (post[1] != ""){
-                    message += `<div class="message-content">${post[1]}</div><br><br>`;
+                if (post[1] != "") {
+                    message += `${post[1]}<br><br>`;
                 }
                 if (post[4]) {
                     const files = post[4].split(',').map(file => file.trim());
@@ -560,6 +592,8 @@ async function fetchChat() {
                         message += `<a href="uploads/${file}" download>${file}</a><br>`;
                     });
                 }
+                message += `</div>`;
+                message += `</div>`;
                 row.innerHTML = message;
                 chatDiv.appendChild(row);
                 lastId = key;
