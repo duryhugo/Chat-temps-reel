@@ -82,7 +82,7 @@ function delete_chat($id) {
 
     if (isset($decode[$id])) {
         unset($decode[$id]);
-        $decode = array_values($decode); // Réindexe le tableau
+        $decode = array_values($decode); // Réindexe le tableau pour s'assurer qu'il n'y a pas de clés manquantes
         $encode = json_encode($decode);
 
         $fopen_w = fopen($filename, "w");
@@ -535,8 +535,12 @@ document.addEventListener('click', function() {
 deleteButton.addEventListener('click', async function() {
     if (messageToDelete) {
         const messageId = messageToDelete.dataset.id;
-        await fetch(`?delete=${messageId}`, {
-            method: 'POST'
+        await fetch('', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `delete=${messageId}`
         });
         messageToDelete.remove();
         messageToDelete = null;
@@ -571,7 +575,7 @@ async function fetchChat() {
                 const post = data[key];
                 const row = document.createElement('div');
                 row.classList.add('msg');
-                row.dataset.id = key;
+                row.dataset.id = key; // Ajoutez l'attribut data-id
 
                 let message = `<div class="profile-and-message">`;
                 if (post[0] === 'Hugo') {
