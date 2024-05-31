@@ -437,7 +437,11 @@ if (isset($_GET["chat"])) {
     </div>
 
     <div class="context-menu" id="context-menu">
-        <button id="delete-message">Supprimer le message</button>
+    <button id="delete-message">Supprimer le message</button>
+    <button id="edit-message">Modifier le message</button>
+    <button id="reply-message">Répondre</button>
+    <button id="react-message">Ajouter une réaction</button>
+</div>
     </div>
 </div>
 
