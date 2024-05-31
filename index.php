@@ -470,199 +470,199 @@ if (isset($_GET["chat"])) {
 </div>
 
 <script>
-let lastId = -1;
-let isScrolledToBottom = true;
-let userSentMessage = false;
-let messageToDelete = null;
+document.addEventListener('DOMContentLoaded', function() {
+    let lastId = -1;
+    let isScrolledToBottom = true;
+    let userSentMessage = false;
+    let messageToDelete = null;
 
-const chatDiv = document.getElementById('chat');
-const contextMenu = document.getElementById('context-menu');
-const deleteButton = document.getElementById('delete-message');
-const emojiButton = document.getElementById('emoji-button');
-const emojiPicker = document.getElementById('emoji-picker');
-const textarea = document.querySelector('textarea[name="chat"]');
-const form = document.getElementById('input-chat');
+    const chatDiv = document.getElementById('chat');
+    const contextMenu = document.getElementById('context-menu');
+    const deleteButton = document.getElementById('delete-message');
+    const emojiButton = document.getElementById('emoji-button');
+    const emojiPicker = document.getElementById('emoji-picker');
+    const textarea = document.querySelector('textarea[name="chat"]');
+    const form = document.getElementById('input-chat');
 
-chatDiv.addEventListener('scroll', function() {
-    isScrolledToBottom = chatDiv.scrollHeight - chatDiv.scrollTop === chatDiv.clientHeight;
-});
-
-document.getElementById('file-button').addEventListener('click', function() {
-    document.getElementById('file-input').click();
-});
-
-document.getElementById('file-input').addEventListener('change', function() {
-    const fileInput = document.getElementById('file-input');
-    const fileNameDiv = document.getElementById('file-name');
-    const files = fileInput.files;
-
-    fileNameDiv.innerHTML = '';
-
-    for (let i = 0; i < files.length; i++) {
-        const fileEntry = document.createElement('div');
-        fileEntry.classList.add('file-entry');
-        fileEntry.innerHTML = `${files[i].name} <span data-index="${i}">✖</span>`;
-        fileNameDiv.appendChild(fileEntry);
-
-        fileEntry.querySelector('span').addEventListener('click', function() {
-            removeFile(i);
-        });
-    }
-});
-
-textarea.addEventListener('keypress', function(event) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
-        form.dispatchEvent(new Event('submit', { cancelable: true }));
-    }
-});
-
-chatDiv.addEventListener('contextmenu', function(event) {
-    event.preventDefault();
-    const target = event.target.closest('div');
-    if (target) {
-        messageToDelete = target;
-        contextMenu.style.top = `${event.clientY}px`;
-        contextMenu.style.left = `${event.clientX}px`;
-        contextMenu.style.display = 'block';
-    }
-});
-
-document.addEventListener('click', function() {
-    contextMenu.style.display = 'none';
-});
-
-deleteButton.addEventListener('click', async function() {
-    if (messageToDelete) {
-        const messageId = messageToDelete.dataset.id;
-        await fetch('', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: `delete=${messageId}`
-        });
-        messageToDelete.remove();
-        messageToDelete = null;
-    }
-});
-
-document.querySelectorAll('.emoji-category').forEach(button => {
-    button.addEventListener('click', function() {
-        document.querySelectorAll('.emoji-list').forEach(list => list.style.display = 'none');
-        const category = this.dataset.category;
-        document.getElementById(`emoji-${category}`).style.display = 'block';
+    chatDiv.addEventListener('scroll', function() {
+        isScrolledToBottom = chatDiv.scrollHeight - chatDiv.scrollTop === chatDiv.clientHeight;
     });
-});
 
-emojiPicker.addEventListener('click', function(event) {
-    if (event.target.tagName === 'SPAN') {
-        textarea.value += event.target.textContent;
-        emojiPicker.style.display = 'none';
-    }
-});
+    document.getElementById('file-button').addEventListener('click', function() {
+        document.getElementById('file-input').click();
+    });
 
-emojiButton.addEventListener('click', function() {
-    emojiPicker.style.display = emojiPicker.style.display === 'block' ? 'none' : 'block';
-});
+    document.getElementById('file-input').addEventListener('change', function() {
+        const fileInput = document.getElementById('file-input');
+        const fileNameDiv = document.getElementById('file-name');
+        const files = fileInput.files;
 
-async function fetchChat() {
-    try {
-        const response = await fetch(`?chat=1&last_id=${lastId}`);
-        const data = await response.json();
-        if (data.status !== 'no data') {
-            Object.keys(data).forEach(key => {
-                const post = data[key];
-                const row = document.createElement('div');
-                row.classList.add('msg');
-                row.dataset.id = key; // Ajoutez l'attribut data-id
+        fileNameDiv.innerHTML = '';
 
-                let message = `<div class="profile-and-message">`;
-                if (post[0] === 'Hugo') {
-                    message += `<div class="profile-circle">`;
-                    message += `<img src="avatars/kaaris.jpg" alt="Photo de profil de Hugo">`;
-                    message += `</div>`;
-                }
-                message += `<div class="message-content">`;
-                message += `<b>${post[0]}</b> `;
-                message += `<span style="color:gray; font-size:smaller;">${post[2]}</span> `;
-                message += `<span style="color:gray; font-size:smaller;">${post[3]}</span><br>`;
-                if (post[1] != "") {
-                    message += `${post[1]}<br><br>`;
-                }
-                if (post[4]) {
-                    const files = post[4].split(',').map(file => file.trim());
-                    files.forEach(file => {
-                        message += `<a href="uploads/${file}" download>${file}</a><br>`;
-                    });
-                }
-                message += `</div>`;
-                message += `</div>`;
-                row.innerHTML = message;
-                chatDiv.appendChild(row);
-                lastId = key;
+        for (let i = 0; i < files.length; i++) {
+            const fileEntry = document.createElement('div');
+            fileEntry.classList.add('file-entry');
+            fileEntry.innerHTML = `${files[i].name} <span data-index="${i}">✖</span>`;
+            fileNameDiv.appendChild(fileEntry);
+
+            fileEntry.querySelector('span').addEventListener('click', function() {
+                removeFile(i);
             });
         }
-        if (isScrolledToBottom || userSentMessage) {
-            chatDiv.scrollTop = chatDiv.scrollHeight;
-            userSentMessage = false;
-        }
-    } catch (error) {
-        console.error('Erreur lors de la récupération des messages:', error);
-    }
-}
+    });
 
-form.addEventListener('submit', async function(event) {
-    event.preventDefault();
-    const formData = new FormData(form);
-    try {
-        await fetch('', {
-            method: 'POST',
-            body: formData
+    textarea.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            form.dispatchEvent(new Event('submit', { cancelable: true }));
+        }
+    });
+
+    chatDiv.addEventListener('contextmenu', function(event) {
+        event.preventDefault();
+        const target = event.target.closest('.msg');
+        if (target) {
+            messageToDelete = target;
+            contextMenu.style.top = `${event.clientY}px`;
+            contextMenu.style.left = `${event.clientX}px`;
+            contextMenu.style.display = 'block';
+        }
+    });
+
+    document.addEventListener('click', function() {
+        contextMenu.style.display = 'none';
+    });
+
+    deleteButton.addEventListener('click', async function() {
+        if (messageToDelete) {
+            const messageId = messageToDelete.dataset.id;
+            await fetch('', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `delete=${messageId}`
+            });
+            messageToDelete.remove(); // Supprime l'élément .msg complet
+            messageToDelete = null;
+        }
+    });
+
+    document.querySelectorAll('.emoji-category').forEach(button => {
+        button.addEventListener('click', function() {
+            document.querySelectorAll('.emoji-list').forEach(list => list.style.display = 'none');
+            const category = this.dataset.category;
+            document.getElementById(`emoji-${category}`).style.display = 'block';
         });
-        form.reset();
-        document.getElementById('file-name').textContent = '';
-        userSentMessage = true;
-    } catch (error) {
-        console.error('Erreur lors de l\'envoi du message:', error);
+    });
+
+    emojiPicker.addEventListener('click', function(event) {
+        if (event.target.tagName === 'SPAN') {
+            textarea.value += event.target.textContent;
+            emojiPicker.style.display = 'none';
+        }
+    });
+
+    emojiButton.addEventListener('click', function() {
+        emojiPicker.style.display = emojiPicker.style.display === 'block' ? 'none' : 'block';
+    });
+
+    async function fetchChat() {
+        try {
+            const response = await fetch(`?chat=1&last_id=${lastId}`);
+            const data = await response.json();
+            if (data.status !== 'no data') {
+                Object.keys(data).forEach(key => {
+                    const post = data[key];
+                    const row = document.createElement('div');
+                    row.classList.add('msg');
+                    row.dataset.id = key;
+
+                    let message = `<div class="profile-and-message">`;
+                    if (post[0] === 'Hugo') {
+                        message += `<div class="profile-circle">`;
+                        message += `<img src="avatars/kaaris.jpg" alt="Photo de profil de Hugo">`;
+                        message += `</div>`;
+                    }
+                    message += `<div class="message-content">`;
+                    message += `<b>${post[0]}</b> `;
+                    message += `<span style="color:gray; font-size:smaller;">${post[2]}</span> `;
+                    message += `<span style="color:gray; font-size:smaller;">${post[3]}</span><br>`;
+                    if (post[1] != "") {
+                        message += `${post[1]}<br><br>`;
+                    }
+                    if (post[4]) {
+                        const files = post[4].split(',').map(file => file.trim());
+                        files.forEach(file => {
+                            message += `<a href="uploads/${file}" download>${file}</a><br>`;
+                        });
+                    }
+                    message += `</div>`;
+                    message += `</div>`;
+                    row.innerHTML = message;
+                    chatDiv.appendChild(row);
+                    lastId = key;
+                });
+            }
+            if (isScrolledToBottom || userSentMessage) {
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+                userSentMessage = false;
+            }
+        } catch (error) {
+            console.error('Erreur lors de la récupération des messages:', error);
+        }
     }
+
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const formData = new FormData(form);
+        try {
+            await fetch('', {
+                method: 'POST',
+                body: formData
+            });
+            form.reset();
+            document.getElementById('file-name').textContent = '';
+            userSentMessage = true;
+        } catch (error) {
+            console.error('Erreur lors de l\'envoi du message:', error);
+        }
+    });
+
+    function removeFile(index) {
+        const fileInput = document.getElementById('file-input');
+        const dataTransfer = new DataTransfer();
+
+        const files = fileInput.files;
+
+        for (let i = 0; i < files.length; i++) {
+            if (i !== index) {
+                dataTransfer.items.add(files[i]);
+            }
+        }
+
+        fileInput.files = dataTransfer.files;
+
+        // Mettre à jour la vue des fichiers
+        const fileNameDiv = document.getElementById('file-name');
+        fileNameDiv.innerHTML = '';
+
+        for (let i = 0; i < fileInput.files.length; i++) {
+            const fileEntry = document.createElement('div');
+            fileEntry.classList.add('file-entry');
+            fileEntry.innerHTML = `${fileInput.files[i].name} <span data-index="${i}">✖</span>`;
+            fileNameDiv.appendChild(fileEntry);
+
+            fileEntry.querySelector('span').addEventListener('click', function() {
+                removeFile(i);
+            });
+        }
+    }
+
+    fetchChat();
+    setInterval(fetchChat, 2000);
 });
 
-function removeFile(index) {
-    const fileInput = document.getElementById('file-input');
-    const dataTransfer = new DataTransfer();
-
-    const files = fileInput.files;
-
-    for (let i = 0; i < files.length; i++) {
-        if (i !== index) {
-            dataTransfer.items.add(files[i]);
-        }
-    }
-
-    fileInput.files = dataTransfer.files;
-
-    // Mettre à jour la vue des fichiers
-    const fileNameDiv = document.getElementById('file-name');
-    fileNameDiv.innerHTML = '';
-
-    for (let i = 0; i < fileInput.files.length; i++) {
-        const fileEntry = document.createElement('div');
-        fileEntry.classList.add('file-entry');
-        fileEntry.innerHTML = `${fileInput.files[i].name} <span data-index="${i}">✖</span>`;
-        fileNameDiv.appendChild(fileEntry);
-
-        fileEntry.querySelector('span').addEventListener('click', function() {
-            removeFile(i);
-        });
-    }
-}
-
-fetchChat();
-setInterval(fetchChat, 2000);
-</script>
-</body>
-</html>
 </script>
 </body>
 </html>
