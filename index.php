@@ -38,7 +38,13 @@ function send_chat($nick, $chat, $files = null) {
 
     if ($files) {
         foreach ($files['name'] as $index => $name) {
-            if ($files['error'][$index] == 0 && $files['size'][$index] <= $maxFileSize) {
+            if ($files['error'][$index] == 0) {
+                if ($files['size'][$index] > $maxFileSize) {
+                    // Fichier trop volumineux
+                    echo json_encode(array('status' => 'error', 'message' => 'Le fichier ' . $name . ' dépasse la taille maximale de 20 Mo.'));
+                    exit;
+                }
+
                 $file_name = basename($name);
                 $file_path = 'uploads/' . $file_name;
                 if (move_uploaded_file($files['tmp_name'][$index], $file_path)) {
@@ -493,23 +499,36 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('file-input').addEventListener('change', function() {
-        const fileInput = document.getElementById('file-input');
-        const fileNameDiv = document.getElementById('file-name');
-        const files = fileInput.files;
+    const fileInput = document.getElementById('file-input');
+    const fileNameDiv = document.getElementById('file-name');
+    const files = fileInput.files;
+    const maxFileSize = 20 * 1024 * 1024; // 20 Mo
 
-        fileNameDiv.innerHTML = '';
+    fileNameDiv.innerHTML = '';
+    let fileTooLarge = false;
 
-        for (let i = 0; i < files.length; i++) {
-            const fileEntry = document.createElement('div');
-            fileEntry.classList.add('file-entry');
-            fileEntry.innerHTML = `${files[i].name} <span data-index="${i}">✖</span>`;
-            fileNameDiv.appendChild(fileEntry);
-
-            fileEntry.querySelector('span').addEventListener('click', function() {
-                removeFile(i);
-            });
+    for (let i = 0; i < files.length; i++) {
+        if (files[i].size > maxFileSize) {
+            fileTooLarge = true;
+            break;
         }
-    });
+
+        const fileEntry = document.createElement('div');
+        fileEntry.classList.add('file-entry');
+        fileEntry.innerHTML = `${files[i].name} <span data-index="${i}">✖</span>`;
+        fileNameDiv.appendChild(fileEntry);
+
+        fileEntry.querySelector('span').addEventListener('click', function() {
+            removeFile(i);
+        });
+    }
+
+    if (fileTooLarge) {
+        alert('Un ou plusieurs fichiers dépassent la taille maximale de 20 Mo.');
+        fileInput.value = ''; // Reset file input
+        fileNameDiv.innerHTML = ''; // Clear file names
+    }
+});
 
     textarea.addEventListener('keypress', function(event) {
         if (event.key === 'Enter' && !event.shiftKey) {
@@ -614,20 +633,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     form.addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const formData = new FormData(form);
-        try {
-            await fetch('', {
-                method: 'POST',
-                body: formData
-            });
-            form.reset();
-            document.getElementById('file-name').textContent = '';
-            userSentMessage = true;
-        } catch (error) {
-            console.error('Erreur lors de l\'envoi du message:', error);
+    const fileInput = document.getElementById('file-input');
+    const files = fileInput.files;
+    const maxFileSize = 20 * 1024 * 1024; // 20 Mo
+    let fileTooLarge = false;
+
+    for (let i = 0; i < files.length; i++) {
+        if (files[i].size > maxFileSize) {
+            fileTooLarge = true;
+            break;
         }
-    });
+    }
+
+    if (fileTooLarge) {
+        alert('Un ou plusieurs fichiers dépassent la taille maximale de 20 Mo.');
+        event.preventDefault();
+        return;
+    }
+
+    event.preventDefault();
+    const formData = new FormData(form);
+    try {
+        await fetch('', {
+            method: 'POST',
+            body: formData
+        });
+        form.reset();
+        document.getElementById('file-name').textContent = '';
+        userSentMessage = true;
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi du message:', error);
+    }
+});
 
     function removeFile(index) {
         const fileInput = document.getElementById('file-input');
