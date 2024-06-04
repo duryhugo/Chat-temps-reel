@@ -62,6 +62,7 @@ function send_chat($nick, $chat, $files = null) {
 
     $format = array($nick, $chat, $date, $time, $file_info_str);
     $decode[] = $format;
+    $decode = array_splice($decode, -400, 400);
     $encode = json_encode($decode);
 
     $fopen_w = fopen($filename, "w");
@@ -301,7 +302,7 @@ if (isset($_GET["chat"])) {
             <form id="input-chat" action="" method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <div class="input-group">
-                        <textarea class="form-control" name="chat" placeholder="Tapez un message"></textarea>
+                        <textarea class="form-control" name="chat" placeholder="Tapez un message (max 1000 caractères)" maxlength="1000"></textarea>
                         <span class="input-group-btn">
                             <button class="btn btn-sm btn-primary" value="Envoyer" type="submit">
                             <img src="envoie.png" alt="Attach" style="width: 18px; height: 18px;">
@@ -585,9 +586,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function fetchChat() {
         try {
-            const response = await fetch(`?chat=1&last_id=${lastId}`);
+            const response = await fetch(`?chat=1&last_id=-1`);
             const data = await response.json();
             if (data.status !== 'no data') {
+                document.getElementById("chat").innerHTML="";
                 Object.keys(data).forEach(key => {
                     const post = data[key];
                     const row = document.createElement('div');
