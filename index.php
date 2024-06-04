@@ -205,7 +205,7 @@ if (isset($_GET["chat"])) {
             display: none;
             position: absolute;
             z-index: 1000;
-            background: #fff;
+            background: #fff; 
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             border-radius: 5px;
             overflow: hidden;
@@ -292,6 +292,10 @@ if (isset($_GET["chat"])) {
     flex-grow: 1; /* Permettre au contenu du message de remplir l'espace restant */
     max-width: calc(100% - 33px); /* Ajustez la largeur du texte pour éviter le chevauchement avec l'image */
 }
+
+.btn-btn-sm-btn-primary:active{
+  background-color: white;
+}
     </style>
 </head>
 <body>
@@ -304,7 +308,7 @@ if (isset($_GET["chat"])) {
                     <div class="input-group">
                         <textarea class="form-control" name="chat" placeholder="Tapez un message (max 1000 caractères)" maxlength="1000"></textarea>
                         <span class="input-group-btn">
-                            <button class="btn btn-sm btn-primary" value="Envoyer" type="submit">
+                            <button class="btn-btn-sm-btn-primary" value="Envoyer" type="submit">
                             <img src="envoie.png" alt="Attach" style="width: 18px; height: 18px;">
                             </button>
                         </span>
